@@ -55,7 +55,7 @@ export default function LogInPage({ navigation }) {
               <Text>Sign in with Facebook</Text>
             </Button>
             <Text style={{ textAlign: "center" }}>- or -</Text>
-            <Button primary block iconLeft style={style.buttonContent}>
+            <Button primary block iconLeft style={style.buttonContent} onPress={() => navigation.navigate('Main')}>
               <Icon name="person" />
               <Text>Continue as Guest</Text>
             </Button>

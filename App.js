@@ -10,6 +10,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import HeroPage from './HeroPage.js';
 import LogInPage from './LogInPage.js';
+import MainPage from './MainPage.js';
 
 const Stack = createStackNavigator();
 
@@ -34,6 +35,7 @@ export default function App(props){
       >
         <Stack.Screen name="Hero" component={HeroPage} />
         <Stack.Screen name="LogIn" component={LogInPage} />
+        <Stack.Screen name="Main" component={MainPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );
