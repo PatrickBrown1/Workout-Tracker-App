@@ -41,14 +41,18 @@ var style = StyleSheet.create({
     width: "20%",
   }
 });
-export default function WorkoutCard() {
+export default function ExerciseCard( {exerciseObj} ) {
+  const exerciseName = exerciseObj.exerciseName;
+  const numSets = exerciseObj.numSets;
+  const numReps = exerciseObj.numReps;
+  const weightLbs = exerciseObj.weightLbs;
   return (
     <Card style={style.card}>
       <CardItem style={style.cardBody}>
-        <H1>Workout Name</H1>
-        <Text>3 sets</Text>
-        <Text>10, 8, 6</Text>
-        <Text>200lbs, 215lbs, 225lbs</Text>
+        <H1>{exerciseName}</H1>
+        <Text>{numSets} sets</Text>
+        <Text>{numReps} reps</Text>
+        <Text>{weightLbs}lbs</Text>
       </CardItem>
       <CardItem style={style.cardToolBar}>
           <Button transparent style={{alignSelf: "center"}}>
