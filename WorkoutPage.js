@@ -4,6 +4,7 @@ import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import WorkoutCard from "./WorkoutCard.js";
 
 import {
   Container,
@@ -37,6 +38,11 @@ export default function WorkoutPage({ navigation }) {
           <Text>
             WorkoutPage
           </Text>
+          <WorkoutCard />
+          <WorkoutCard />
+          <WorkoutCard />
+          <WorkoutCard />
+          <WorkoutCard />
         </Content>
       </Container>
     </StyleProvider>
