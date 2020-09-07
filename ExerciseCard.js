@@ -41,7 +41,7 @@ var style = StyleSheet.create({
     width: "20%",
   }
 });
-export default function ExerciseCard( {exerciseObj} ) {
+export default function ExerciseCard( {exerciseKey, exerciseObj, removeSelf} ) {
   const exerciseName = exerciseObj.exerciseName;
   const numSets = exerciseObj.numSets;
   const numReps = exerciseObj.numReps;
@@ -55,7 +55,7 @@ export default function ExerciseCard( {exerciseObj} ) {
         <Text>{weightLbs}lbs</Text>
       </CardItem>
       <CardItem style={style.cardToolBar}>
-          <Button transparent style={{alignSelf: "center"}}>
+          <Button transparent style={{alignSelf: "center"}} onPress={removeSelf}>
             <Icon active name="close-circle" size={26}/>
           </Button>
           <Button transparent style={{alignSelf: "center"}}>

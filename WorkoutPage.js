@@ -14,6 +14,7 @@ import {
   Text,
   Button,
   H1,
+  H2,
   Icon,
   StyleProvider,
   Card,
@@ -52,6 +53,11 @@ function createWorkout(key, title, numExercises, exerciseArray){
   workoutObj.title = title;
   workoutObj.numExercises = numExercises;
   workoutObj.exerciseArray = exerciseArray;
+  workoutObj.exerciseArray.forEach( (exercise) => {
+    var exerciseKey = exercise.exerciseName + "-" + exercise.numSets + "-" 
+      + exercise.numReps + "-" + exercise.weightLbs;
+    exercise.key = exerciseKey;
+  });
   return workoutObj;
 } 
 const workouts = {
@@ -71,24 +77,31 @@ const workouts = {
   ]
 ),
 }
-function createCardList(workoutID){
-  const currentWorkoutObj = workouts[workoutID];
-  console.log(currentWorkoutObj.exerciseArray);
+function removeExercise(exerciseKey, currentWorkout, setCurrentWorkout){
+  var changedExerciseArray = [];
+  var changedCurrentWorkout = Object.assign({}, currentWorkout);
+  currentWorkout.exerciseArray.forEach(exercise => exercise.key !== exerciseKey ? changedExerciseArray.push(exercise) : null);
+  changedCurrentWorkout.exerciseArray = changedExerciseArray;
+  changedCurrentWorkout.numExercises = changedExerciseArray.length;
+  setCurrentWorkout(changedCurrentWorkout);
+}
+function createCardList(currentWorkout, setCurrentWorkout){ 
   const renderCard = ({ item }) => (
-    <ExerciseCard exerciseObj={item}  />
+    <ExerciseCard exerciseKey={item.key} exerciseObj={item} removeSelf={() => removeExercise(item.key, currentWorkout, setCurrentWorkout)} />
   );
   return(
     <FlatList
-      data={currentWorkoutObj.exerciseArray}
+      data={currentWorkout.exerciseArray}
       renderItem={renderCard}
+      keyExtractor={item => item.key}
     />
   );
   
 }
 export default function WorkoutPage({ navigation }) {
   const [workoutName, setWorkoutName] = React.useState("null");
-  console.log(workoutName);
-  
+  const [currentWorkout, setCurrentWorkout] = React.useState({});
+  const workoutCardList = createCardList(currentWorkout, setCurrentWorkout);
   return (
     <SafeAreaView style={style.container}>
       <View>
@@ -103,16 +116,20 @@ export default function WorkoutPage({ navigation }) {
             selectedValue={workoutName}
             onValueChange={(itemValue, itemIndex) => {
               setWorkoutName(itemValue);
+              setCurrentWorkout(workouts[itemValue]);
             }}
           >
             {Object.entries(workouts).map( ([key, value]) => (
-              <Picker.Item label={value.title} value={key} />
+              <Picker.Item key={key} label={value.title} value={key} />
             ))}
           </Picker>
         </Form>
       </View>
-      {workoutName !== "null" && 
-        createCardList(workoutName)
+      {workoutName !== "null" && currentWorkout.numExercises > 0 &&
+        workoutCardList
+      }
+      { workoutName !== "null" && currentWorkout.numExercises === 0 && 
+        <H2 style={{alignSelf: "center", textAlign: "center", paddingTop: 100}}>There aren't any exercises in this workout!</H2>
       }
     </SafeAreaView>
   );
