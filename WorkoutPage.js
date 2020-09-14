@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, View, FlatList, SafeAreaView } from "react-native";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
@@ -43,8 +43,12 @@ var style = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
   },
+  buttonContent: {
+    marginTop: 5,
+    marginBottom: 5,
+  },
 });
-function createWorkout(key, title, numExercises, exerciseArray){
+function createWorkout(key, title, numExercises, exerciseArray) {
   //exercise array will be an array of objects
   //the objects will look like {"Exercise_Name", #Sets, #Rep, Weight(lbs)}
   //will parse by comma
@@ -53,55 +57,97 @@ function createWorkout(key, title, numExercises, exerciseArray){
   workoutObj.title = title;
   workoutObj.numExercises = numExercises;
   workoutObj.exerciseArray = exerciseArray;
-  workoutObj.exerciseArray.forEach( (exercise) => {
-    var exerciseKey = exercise.exerciseName + "-" + exercise.numSets + "-" 
-      + exercise.numReps + "-" + exercise.weightLbs;
+  workoutObj.exerciseArray.forEach((exercise) => {
+    var exerciseKey =
+      exercise.exerciseName +
+      "-" +
+      exercise.numSets +
+      "-" +
+      exercise.numReps +
+      "-" +
+      exercise.weightLbs;
     exercise.key = exerciseKey;
   });
   return workoutObj;
-} 
-const workouts = {
-  "legsworkout1": createWorkout("legsworkout1", "Legs Workout 1", "4", 
-    [
-      {exerciseName: "Legs Exercise 1", numSets: 4, numReps: 8, weightLbs: 135},
-      {exerciseName: "Legs Exercise 2", numSets: 3, numReps: 12, weightLbs: 135},
-      {exerciseName: "Legs Exercise 3", numSets: 4, numReps: 8, weightLbs: 185},
-      {exerciseName: "Legs Exercise 4", numSets: 3, numReps: 12, weightLbs: 135},
-    ]
-  ),
-  "armsworkout1": createWorkout("armssworkout1", "Arms Workout 1", "3", 
-  [
-    {exerciseName: "Arm Exercise 1", numSets: 4, numReps: 8, weightLbs: 35},
-    {exerciseName: "Arm Exercise 2", numSets: 3, numReps: 12, weightLbs: 25},
-    {exerciseName: "Arm Exercise 3", numSets: 4, numReps: 8, weightLbs: 60},
-  ]
-),
 }
-function removeExercise(exerciseKey, currentWorkout, setCurrentWorkout){
+const workouts = {
+  legsworkout1: createWorkout("legsworkout1", "Legs Workout 1", "4", [
+    { exerciseName: "Legs Exercise 1", numSets: 4, numReps: 8, weightLbs: 135 },
+    {
+      exerciseName: "Legs Exercise 2",
+      numSets: 3,
+      numReps: 12,
+      weightLbs: 135,
+    },
+    { exerciseName: "Legs Exercise 3", numSets: 4, numReps: 8, weightLbs: 185 },
+    {
+      exerciseName: "Legs Exercise 4",
+      numSets: 3,
+      numReps: 12,
+      weightLbs: 135,
+    },
+  ]),
+  armsworkout1: createWorkout("armssworkout1", "Arms Workout 1", "3", [
+    { exerciseName: "Arm Exercise 1", numSets: 4, numReps: 8, weightLbs: 35 },
+    { exerciseName: "Arm Exercise 2", numSets: 3, numReps: 12, weightLbs: 25 },
+    { exerciseName: "Arm Exercise 3", numSets: 4, numReps: 8, weightLbs: 60 },
+  ]),
+};
+function removeExercise(exerciseKey, currentWorkout, setCurrentWorkout) {
   var changedExerciseArray = [];
   var changedCurrentWorkout = Object.assign({}, currentWorkout);
-  currentWorkout.exerciseArray.forEach(exercise => exercise.key !== exerciseKey ? changedExerciseArray.push(exercise) : null);
+  currentWorkout.exerciseArray.forEach(
+    (exercise) =>
+      exercise.key !== exerciseKey && changedExerciseArray.push(exercise)
+  );
   changedCurrentWorkout.exerciseArray = changedExerciseArray;
   changedCurrentWorkout.numExercises = changedExerciseArray.length;
   setCurrentWorkout(changedCurrentWorkout);
 }
-function createCardList(currentWorkout, setCurrentWorkout){ 
+function createCardList(currentWorkout, setCurrentWorkout) {
   const renderCard = ({ item }) => (
-    <ExerciseCard exerciseKey={item.key} exerciseObj={item} removeSelf={() => removeExercise(item.key, currentWorkout, setCurrentWorkout)} />
+    <ExerciseCard
+      exerciseKey={item.key}
+      exerciseObj={item}
+      removeSelf={() =>
+        removeExercise(item.key, currentWorkout, setCurrentWorkout)
+      }
+    />
   );
-  return(
+  return (
     <FlatList
       data={currentWorkout.exerciseArray}
       renderItem={renderCard}
-      keyExtractor={item => item.key}
+      keyExtractor={(item) => item.key}
     />
   );
-  
 }
 export default function WorkoutPage({ navigation }) {
   const [workoutName, setWorkoutName] = React.useState("null");
   const [currentWorkout, setCurrentWorkout] = React.useState({});
   const workoutCardList = createCardList(currentWorkout, setCurrentWorkout);
+  const ListEmptyComponent = () => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text
+          style={{
+            alignSelf: "center",
+            textAlign: "center",
+            paddingLeft: 50,
+            paddingRight: 50,
+          }}
+        >
+          There aren't any exercises in this workout!
+        </Text>
+      </View>
+    );
+  };
   return (
     <SafeAreaView style={style.container}>
       <View>
@@ -119,18 +165,18 @@ export default function WorkoutPage({ navigation }) {
               setCurrentWorkout(workouts[itemValue]);
             }}
           >
-            {Object.entries(workouts).map( ([key, value]) => (
+            {Object.entries(workouts).map(([key, value]) => (
               <Picker.Item key={key} label={value.title} value={key} />
             ))}
           </Picker>
         </Form>
       </View>
-      {workoutName !== "null" && currentWorkout.numExercises > 0 &&
-        workoutCardList
-      }
-      { workoutName !== "null" && currentWorkout.numExercises === 0 && 
-        <H2 style={{alignSelf: "center", textAlign: "center", paddingTop: 100}}>There aren't any exercises in this workout!</H2>
-      }
+      {workoutName !== "null" &&
+        currentWorkout.numExercises > 0 &&
+        workoutCardList}
+      {workoutName !== "null" &&
+        currentWorkout.numExercises === 0 &&
+        (<ListEmptyComponent />)}
     </SafeAreaView>
   );
 }
