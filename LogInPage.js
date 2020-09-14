@@ -18,6 +18,7 @@ import {
   Fab,
 } from "native-base";
 
+import Icon2 from "react-native-vector-icons/MaterialCommunityIcons";
 import getTheme from "./native-base-theme/components";
 import material from "./native-base-theme/variables/material";
 
@@ -43,7 +44,7 @@ export default function LogInPage({ navigation }) {
       <Container style={style.body}>
         <Content>
           <Fab position="topLeft" onPress={() => navigation.goBack()} style={{backgroundColor: "#3F51B5"}}>
-            <Icon name="arrow-back" />
+            <Icon2 name="arrow-left" />
           </Fab>
           <Card bordered style={style.buttonCard}>
             <Button primary block iconLeft style={style.buttonContent}>
