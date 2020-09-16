@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, View, FlatList, SafeAreaView } from "react-native";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
-import { NavigationContainer } from "@react-navigation/native";
+import {
+  DefaultTheme,
+  NavigationContainer,
+  ThemeProvider,
+} from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import ExerciseCard from "./ExerciseCard.js";
 
@@ -19,6 +23,10 @@ import {
   Card,
   Picker,
   Form,
+  Left,
+  Right,
+  Body,
+  Title,
 } from "native-base";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -108,7 +116,12 @@ function removeExercise(exerciseKey, currentWorkout, setCurrentWorkout) {
   setCurrentWorkout(changedCurrentWorkout);
 }
 function startWorkout(workout) {}
-function createCardList(currentWorkout, setCurrentWorkout, setCurrentPage) {
+function createCardList(
+  currentWorkout,
+  setCurrentWorkout,
+  setCurrentPage,
+  setCurrentWorkoutParent
+) {
   const renderCard = ({ item }) => (
     <ExerciseCard
       exerciseKey={item.key}
@@ -125,8 +138,15 @@ function createCardList(currentWorkout, setCurrentWorkout, setCurrentPage) {
       keyExtractor={(item) => item.key}
       ListFooterComponent={
         <View style={{ flex: 1 }}>
-          <Button iconRight primary style={style.buttonContent}
-            onPress={() => setCurrentPage("active")}>
+          <Button
+            iconRight
+            primary
+            style={style.buttonContent}
+            onPress={() => {
+              setCurrentPage("active");
+              setCurrentWorkoutParent(currentWorkout);
+            }}
+          >
             <Text bold>Start Workout</Text>
             <Icon
               color="white"
@@ -139,11 +159,17 @@ function createCardList(currentWorkout, setCurrentWorkout, setCurrentPage) {
     />
   );
 }
-export default function SelectWorkoutPage( props ) {
+export default function SelectWorkoutPage(props) {
   const [workoutName, setWorkoutName] = React.useState("null");
   const [currentWorkout, setCurrentWorkout] = React.useState({});
   const setCurrentPage = props.setCurrentPage;
-  const workoutCardList = createCardList(currentWorkout, setCurrentWorkout, setCurrentPage);
+  const setCurrentWorkoutParent = props.setCurrentWorkout;
+  const workoutCardList = createCardList(
+    currentWorkout,
+    setCurrentWorkout,
+    setCurrentPage,
+    setCurrentWorkoutParent
+  );
   const ListEmptyComponent = () => {
     return (
       <View
@@ -167,32 +193,44 @@ export default function SelectWorkoutPage( props ) {
     );
   };
   return (
-    <View style={{ flex: 1 }}>
-      <H1 style={style.header}>Workout Page</H1>
-      <Form>
-        <Picker
-          style={style.picker}
-          mode="dropdown"
-          iosIcon={<Icon name="arrow-down" />}
-          placeholder="Pick your Workout"
-          placeholderStyle={{ color: "#bfc6ea" }}
-          selectedValue={workoutName}
-          onValueChange={(itemValue, itemIndex) => {
-            setWorkoutName(itemValue);
-            setCurrentWorkout(workouts[itemValue]);
-          }}
-        >
-          {Object.entries(workouts).map(([key, value]) => (
-            <Picker.Item key={key} label={value.title} value={key} />
-          ))}
-        </Picker>
-      </Form>
-      {workoutName !== "null" &&
-        currentWorkout.numExercises > 0 &&
-        workoutCardList}
-      {workoutName !== "null" && currentWorkout.numExercises === 0 && (
-        <ListEmptyComponent />
-      )}
-    </View>
+    <StyleProvider style={getTheme(material)}>
+      <View style={{ flex: 1 }}>
+        <H1 style={style.header}>Workout Page</H1>
+        <Form>
+          <Picker
+            style={style.picker}
+            mode="dropdown"
+            iosIcon={<Icon name="arrow-down" />}
+            placeholder="Pick your Workout"
+            placeholderStyle={{ color: "#bfc6ea" }}
+            renderHeader={(backAction) => (
+              <Header style={{ backgroundColor: "#3F51B5" }}>
+                <Button icon transparent onPress={backAction}>
+                  <Icon name="arrow-left" style={{ color: "#fff" }} size={20}/>
+                </Button>
+                <Body style={{ flex: 3 }}>
+                  <Title>Pick a Workout</Title>
+                </Body>
+              </Header>
+            )}
+            selectedValue={workoutName}
+            onValueChange={(itemValue, itemIndex) => {
+              setWorkoutName(itemValue);
+              setCurrentWorkout(workouts[itemValue]);
+            }}
+          >
+            {Object.entries(workouts).map(([key, value]) => (
+              <Picker.Item key={key} label={value.title} value={key} />
+            ))}
+          </Picker>
+        </Form>
+        {workoutName !== "null" &&
+          currentWorkout.numExercises > 0 &&
+          workoutCardList}
+        {workoutName !== "null" && currentWorkout.numExercises === 0 && (
+          <ListEmptyComponent />
+        )}
+      </View>
+    </StyleProvider>
   );
 }

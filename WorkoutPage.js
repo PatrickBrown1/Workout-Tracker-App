@@ -38,10 +38,10 @@ export default function WorkoutPage({ navigation }) {
     <StyleProvider style={getTheme(material)}>
       <SafeAreaView style={style.container}>
         {currentPage === "select" && (
-          <SelectWorkoutPage setCurrentPage={setCurrentPage} />
+          <SelectWorkoutPage setCurrentPage={setCurrentPage} setCurrentWorkout={setCurrentWorkout} />
         )}
         {currentPage === "active" && (
-          <ActiveWorkoutPage setCurrentPage={setCurrentPage} />
+          <ActiveWorkoutPage currentWorkout={currentWorkout} setCurrentWorkout={setCurrentWorkout} setCurrentPage={setCurrentPage} />
         )}
       </SafeAreaView>
     </StyleProvider>
