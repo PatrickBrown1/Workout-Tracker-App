@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { StyleSheet, View, FlatList, SafeAreaView } from "react-native";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  SafeAreaView,
+  Modal,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+} from "react-native";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import {
@@ -21,6 +29,7 @@ import {
   H2,
   StyleProvider,
   Card,
+  CardItem,
   Picker,
   Form,
   Left,
@@ -51,12 +60,19 @@ var style = StyleSheet.create({
     width: "90%",
     alignSelf: "center",
   },
-  buttonContent: {
-    alignSelf: "center",
-    marginTop: 20,
-    marginBottom: 20,
-    paddingRight: 20,
-    paddingLeft: 20,
+  addButton: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+    padding: 10,
+  },
+  startWorkoutButton: {
+    flex: 4,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 10,
+    padding: 10,
   },
 });
 function createWorkout(key, title, numExercises, exerciseArray) {
@@ -120,7 +136,8 @@ function createCardList(
   currentWorkout,
   setCurrentWorkout,
   setCurrentPage,
-  setCurrentWorkoutParent
+  setCurrentWorkoutParent,
+  setAddExerciseModal
 ) {
   const renderCard = ({ item }) => (
     <ExerciseCard
@@ -137,11 +154,26 @@ function createCardList(
       renderItem={renderCard}
       keyExtractor={(item) => item.key}
       ListFooterComponent={
-        <View style={{ flex: 1 }}>
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            justifyContent: "space-around",
+            padding: 17,
+          }}
+        >
+          <Button
+            icon
+            primary
+            style={style.addButton}
+            onPress={() => setAddExerciseModal(true)}
+          >
+            <Icon color="white" size={26} name="plus" />
+          </Button>
           <Button
             iconRight
             primary
-            style={style.buttonContent}
+            style={style.startWorkoutButton}
             onPress={() => {
               setCurrentPage("active");
               setCurrentWorkoutParent(currentWorkout);
@@ -162,13 +194,15 @@ function createCardList(
 export default function SelectWorkoutPage(props) {
   const [workoutName, setWorkoutName] = React.useState("null");
   const [currentWorkout, setCurrentWorkout] = React.useState({});
+  const [addExerciseModal, setAddExerciseModal] = React.useState(false);
   const setCurrentPage = props.setCurrentPage;
   const setCurrentWorkoutParent = props.setCurrentWorkout;
   const workoutCardList = createCardList(
     currentWorkout,
     setCurrentWorkout,
     setCurrentPage,
-    setCurrentWorkoutParent
+    setCurrentWorkoutParent,
+    setAddExerciseModal
   );
   const ListEmptyComponent = () => {
     return (
@@ -206,7 +240,7 @@ export default function SelectWorkoutPage(props) {
             renderHeader={(backAction) => (
               <Header style={{ backgroundColor: "#3F51B5" }}>
                 <Button icon transparent onPress={backAction}>
-                  <Icon name="arrow-left" style={{ color: "#fff" }} size={20}/>
+                  <Icon name="arrow-left" style={{ color: "#fff" }} size={20} />
                 </Button>
                 <Body style={{ flex: 3 }}>
                   <Title>Pick a Workout</Title>
@@ -230,6 +264,55 @@ export default function SelectWorkoutPage(props) {
         {workoutName !== "null" && currentWorkout.numExercises === 0 && (
           <ListEmptyComponent />
         )}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={addExerciseModal}
+          onRequestClose={() => setAddExerciseModal(false)}
+        >
+          <TouchableOpacity
+            style={{
+              flex: 1,
+              backgroundColor: "rgba(0, 0, 0, 0.7)",
+              justifyContent: "center",
+            }}
+            activeOpacity={1}
+            onPressOut={() => {
+              setAddExerciseModal(false);
+            }}
+          >
+            <TouchableWithoutFeedback>
+              <Card
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  backgroundColor: "white",
+                  alignSelf: "center",
+                  padding: 10,
+                  margin: 10,
+                  height: "70%",
+                  width: "80%",
+                }}
+              >
+                <CardItem header>
+                  <Text>Add a new Exercise</Text>
+                </CardItem>
+                <CardItem>
+                  <Body>
+                    <Text> Forum </Text>
+                  </Body>
+                </CardItem>
+                <CardItem footer>
+                  <Button primary onPress={() => setAddExerciseModal(false)}>
+                    <Text>Done</Text>
+                  </Button>
+                </CardItem>
+              </Card>
+            </TouchableWithoutFeedback>
+          </TouchableOpacity>
+        </Modal>
       </View>
     </StyleProvider>
   );
