@@ -7,6 +7,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
@@ -36,6 +37,9 @@ import {
   Right,
   Body,
   Title,
+  Item,
+  Label,
+  Input,
 } from "native-base";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -131,7 +135,6 @@ function removeExercise(exerciseKey, currentWorkout, setCurrentWorkout) {
   changedCurrentWorkout.numExercises = changedExerciseArray.length;
   setCurrentWorkout(changedCurrentWorkout);
 }
-function startWorkout(workout) {}
 function createCardList(
   currentWorkout,
   setCurrentWorkout,
@@ -191,10 +194,33 @@ function createCardList(
     />
   );
 }
+function addNewExerciseToCurrentWorkout(
+  currentWorkout,
+  setCurrentWorkout,
+  exerciseName,
+  exerciseSets,
+  exerciseReps
+) {
+  const exerciseKey =
+    exerciseName + "-" + exerciseSets + "-" + exerciseReps + "-0";
+  var tempWorkout = Object.assign({}, currentWorkout);
+  var newExercise = {
+    exerciseName: exerciseName,
+    key: exerciseKey,
+    numSets: exerciseSets,
+    numReps: exerciseReps,
+    weightLbs: 0,
+  };
+  tempWorkout.exerciseArray.push(newExercise);
+  setCurrentWorkout(tempWorkout);
+}
 export default function SelectWorkoutPage(props) {
   const [workoutName, setWorkoutName] = React.useState("null");
   const [currentWorkout, setCurrentWorkout] = React.useState({});
   const [addExerciseModal, setAddExerciseModal] = React.useState(false);
+  const [addExerciseName, setAddExerciseName] = React.useState(null);
+  const [addExerciseSets, setAddExerciseSets] = React.useState(null);
+  const [addExerciseReps, setAddExerciseReps] = React.useState(null);
   const setCurrentPage = props.setCurrentPage;
   const setCurrentWorkoutParent = props.setCurrentWorkout;
   const workoutCardList = createCardList(
@@ -274,38 +300,94 @@ export default function SelectWorkoutPage(props) {
             style={{
               flex: 1,
               backgroundColor: "rgba(0, 0, 0, 0.7)",
-              justifyContent: "center",
+              paddingTop: 40,
+              justifyContent: "flex-start",
             }}
             activeOpacity={1}
             onPressOut={() => {
               setAddExerciseModal(false);
+              setAddExerciseName(null);
+              setAddExerciseSets(null);
+              setAddExerciseReps(null);
             }}
           >
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                Keyboard.dismiss();
+              }}
+            >
               <Card
                 style={{
                   display: "flex",
                   flexDirection: "column",
-                  justifyContent: "space-between",
                   alignItems: "center",
                   backgroundColor: "white",
                   alignSelf: "center",
                   padding: 10,
                   margin: 10,
-                  height: "70%",
+                  height: "55%",
                   width: "80%",
                 }}
               >
-                <CardItem header>
-                  <Text>Add a new Exercise</Text>
+                <CardItem header style={{ flex: 1 }}>
+                  <Text style={{ fontSize: 16 }}>Add a new Exercise</Text>
                 </CardItem>
-                <CardItem>
+                <CardItem style={{ flex: 6 }}>
                   <Body>
-                    <Text> Forum </Text>
+                    <Form style={{ width: "100%", fontSize: 12 }}>
+                      <Item style={{ margin: 12, height: 20 }}>
+                        <Input
+                          placeholder="Name of Exercise"
+                          onChangeText={(text) => setAddExerciseName(text)}
+                        />
+                      </Item>
+                      <Item style={{ margin: 12, height: 20 }}>
+                        <Input
+                          placeholder="Number of Sets"
+                          onChangeText={(text) =>
+                            setAddExerciseSets(parseInt(text))
+                          }
+                          keyboardType="numeric"
+                        />
+                      </Item>
+                      <Item last style={{ margin: 12, height: 20 }}>
+                        <Input
+                          placeholder="Reps per Set"
+                          onChangeText={(text) =>
+                            setAddExerciseReps(parseInt(text))
+                          }
+                          keyboardType="numeric"
+                        />
+                      </Item>
+                    </Form>
                   </Body>
                 </CardItem>
-                <CardItem footer>
-                  <Button primary onPress={() => setAddExerciseModal(false)}>
+                <CardItem footer style={{ flex: 1, marginBottom: 20 }}>
+                  <Button
+                    primary
+                    onPress={() => {
+                      if (
+                        addExerciseName === null ||
+                        addExerciseSets === null ||
+                        addExerciseReps === null
+                      ) {
+                        console.log("no input");
+                      } else {
+                        setAddExerciseModal(false);
+                        addNewExerciseToCurrentWorkout(
+                          currentWorkout,
+                          setCurrentWorkout,
+                          addExerciseName,
+                          addExerciseSets,
+                          addExerciseReps
+                        );
+
+                        setAddExerciseName(null);
+                        setAddExerciseSets(null);
+                        setAddExerciseReps(null);
+                      }
+                    }}
+                  >
                     <Text>Done</Text>
                   </Button>
                 </CardItem>
