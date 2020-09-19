@@ -5,6 +5,7 @@ import {
   FlatList,
   SafeAreaView,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { AppLoading } from "expo";
 import * as Font from "expo-font";
@@ -66,17 +67,6 @@ var style = StyleSheet.create({
     paddingLeft: 20,
   },
 });
-function updateWorkoutObject(
-  activeWorkoutObject,
-  setActiveWorkoutObject,
-  currsetArray,
-  exerciseObject
-) {
-  var tempAWO = Object.assign({}, activeWorkoutObject);
-  console.log(tempAWO);
-  tempAWO[exerciseObject.exerciseName].setArray = currsetArray;
-  setActiveWorkoutObject(tempAWO);
-}
 function renderSwiper(
   currentWorkout,
   currentExerciseIndex,
@@ -99,7 +89,7 @@ function renderSwiper(
   //   console.log("updating scroll");
   //   setCurrentExerciseIndex(index);
   // };
-  
+
   const renderExercise = ({ item, index }) => {
     const setArray = [];
     //filled with objects like {setReps: ..., setWeight: ...}
@@ -108,18 +98,20 @@ function renderSwiper(
       var defaultReps = 0;
       var defaultWeight = 0;
       setArray.push({
+        key: item.exerciseName + "." + i,
         setNum: i,
         setReps: defaultReps,
         setWeight: defaultWeight,
       });
     }
-    console.log(activeWorkoutObject);
     item.setArray = setArray;
     const updateItem = () => {
-      activeWorkoutObject.exerciseArray[currentExerciseIndex]["setArray"] = setArray;
+      activeWorkoutObject.exerciseArray[currentExerciseIndex][
+        "setArray"
+      ] = setArray;
       setActiveWorkoutObject(activeWorkoutObject);
-      console.log(activeWorkoutObject);
-    }
+    };
+    console.log(setArray);
     return (
       <Card
         style={{
@@ -138,60 +130,63 @@ function renderSwiper(
         <CardItem cardBody style={{ flex: 4, justifyContent: "center" }}>
           <Body>
             <Form style={{ width: "100%" }}>
-              {setArray.map((setObj) => (
-                <View
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    width: "100%",
-                    flexWrap: "wrap",
-                  }}
-                  key={setObj.setNum + ".setinput"}
-                >
-                  <Item
-                    key={setObj.setNum + ".repinput"}
+              <FlatList
+                data={setArray}
+                keyExtractor={(newItem) => newItem.key}
+                renderItem={(newItem ) => (
+                  <View
                     style={{
-                      flex: "1 0 30%",
-                      width: "30%",
-                      margin: 12,
-                      height: 20,
+                      display: "flex",
+                      flexDirection: "row",
+                      width: "100%",
+                      flexWrap: "wrap",
                     }}
+                    key={newItem.setNum + ".setinput"}
                   >
-                    <Input
-                      placeholder="num reps"
-                      onChangeText={(text) => {
-                        setObj.setReps = parseInt(text);
-                        updateItem();
+                    <Item
+                      key={newItem.setNum + ".repinput"}
+                      style={{
+                        flex: "1 0 30%",
+                        width: "30%",
+                        margin: 12,
+                        height: 20,
                       }}
-                      keyboardType="numeric"
-                      style={{ textAlign: "center" }}
-                    />
-                  </Item>
-                  <Item
-                    key={setObj.setNum + ".weightinput"}
-                    style={{
-                      flex: "1 0 30%",
-                      width: "30%",
-                      margin: 12,
-                      height: 20,
-                    }}
-                  >
-                    <Input
-                      placeholder="weight"
-                      onChangeText={(text) => {
-                        setObj.setWeight = parseInt(text);
-                        updateItem();
+                    >
+                      <Input
+                        placeholder="num reps"
+                        onChangeText={(text) => {
+                          newItem.setReps = parseInt(text);
+                          updateItem();
+                        }}
+                        keyboardType="numeric"
+                        style={{ textAlign: "center" }}
+                      />
+                    </Item>
+                    <Item
+                      key={newItem.setNum + ".weightinput"}
+                      style={{
+                        flex: "1 0 30%",
+                        width: "30%",
+                        margin: 12,
+                        height: 20,
                       }}
-                      keyboardType="numeric"
-                      style={{ textAlign: "center" }}
-                    />
-                  </Item>
-                </View>
-              ))}
+                    >
+                      <Input
+                        placeholder="weight"
+                        onChangeText={(text) => {
+                          newItem.setWeight = parseInt(text);
+                          updateItem();
+                        }}
+                        keyboardType="numeric"
+                        style={{ textAlign: "center" }}
+                      />
+                    </Item>
+                  </View>
+                )}
+              />
             </Form>
           </Body>
         </CardItem>
-        <CardItem footer></CardItem>
       </Card>
     );
   };
