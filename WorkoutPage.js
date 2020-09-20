@@ -41,7 +41,7 @@ export default function WorkoutPage({ navigation }) {
           <SelectWorkoutPage setCurrentPage={setCurrentPage} setCurrentWorkout={setCurrentWorkout} />
         )}
         {currentPage === "active" && (
-          <ActiveWorkoutPage currentWorkout={currentWorkout} setCurrentWorkout={setCurrentWorkout} setCurrentPage={setCurrentPage} />
+          <ActiveWorkoutPage navigation={navigation} currentWorkout={currentWorkout} setCurrentWorkout={setCurrentWorkout} setCurrentPage={setCurrentPage} />
         )}
       </SafeAreaView>
     </StyleProvider>

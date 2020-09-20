@@ -98,6 +98,20 @@ function createWorkout(key, title, numExercises, exerciseArray) {
       "-" +
       exercise.weightLbs;
     exercise.key = exerciseKey;
+    const setArray = [];
+    //filled with objects like {setReps: ..., setWeight: ...}
+    var i = 0;
+    for (i = 0; i < exercise.numSets; i++) {
+      var defaultReps = 0;
+      var defaultWeight = 0;
+      setArray.push({
+        key: exercise.exerciseName + "." + i,
+        setNum: i,
+        setReps: defaultReps,
+        setWeight: defaultWeight,
+      });
+    }
+    exercise.setArray = setArray;
   });
   return workoutObj;
 }
